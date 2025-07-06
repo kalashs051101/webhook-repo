@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>GitHub Activity Feed</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <style>
+    body {
+      background: #f4f4f4;
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      max-width: 700px;
+      margin: 80px auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    h2 {
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+    #events p {
+      background: #f9f9f9;
+      margin: 10px 0;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+    .no-data {
+      color: #777;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Latest GitHub Activity</h2>
+    <div id="events">
+      <p class="no-data">Loading...</p>
+    </div>
+  </div>
+
+  <script>
+    async function loadEvents() {
+      const container = document.getElementById("events");
+      container.innerHTML = '';
+
+      try {
+        const res = await fetch('/events');
+        const data = await res.json();
+        console.log(data)
+
+        if (data.length === 0) {
+          const msg = document.createElement("p");
+          msg.className = "no-data";
+          msg.textContent = "No activity found yet.";
+          container.appendChild(msg);
+        } else {
+          data.forEach(msg => {
+            const p = document.createElement("p");
+            p.textContent = msg;
+            container.appendChild(p);
+          });
+        }
+      } catch (err) {
+        const error = document.createElement("p");
+        error.className = "no-data";
+        error.textContent = "Failed to load events.";
+        container.appendChild(error);
+        console.error("Error fetching events:", err);
+      }
+    }
+
+    setInterval(loadEvents, 15000); // Refresh every 15s
+    window.onload = loadEvents;
+  </script>
+</body>
+</html>
